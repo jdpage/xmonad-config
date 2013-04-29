@@ -1,9 +1,12 @@
 import XMonad
+
 import XMonad.Config.Desktop
 import XMonad.Config.Xfce
+
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.Place
+
 import XMonad.Layout.Fullscreen
 import XMonad.Layout.Grid
 import XMonad.Layout.IM
@@ -12,6 +15,7 @@ import XMonad.Layout.PerWorkspace
 import XMonad.Layout.Reflect
 import XMonad.Layout.Tabbed
 import XMonad.Layout.ToggleLayouts
+
 import XMonad.Util.EZConfig
 
 import qualified XMonad.StackSet as W
@@ -67,16 +71,16 @@ twoPaneLayout = Tall nmaster delta ratio
 
 withTwoIM left right base = withIM (1%6) right $ reflectHoriz $ withIM (1%5) left $ reflectHoriz $ base
 
-twoPaneFirst = desktopLayoutModifiers $ twoPaneLayout ||| Mirror twoPaneLayout ||| Grid ||| simpleTabbed
-gridFirst    = desktopLayoutModifiers $ Grid ||| simpleTabbed ||| twoPaneLayout ||| Mirror twoPaneLayout
-tabbedFirst  = desktopLayoutModifiers $ simpleTabbed ||| twoPaneLayout ||| Mirror twoPaneLayout ||| Grid
+twoPaneFirst = twoPaneLayout ||| Mirror twoPaneLayout ||| Grid ||| simpleTabbed
+gridFirst    = Grid ||| simpleTabbed ||| twoPaneLayout ||| Mirror twoPaneLayout
+tabbedFirst  = simpleTabbed ||| twoPaneLayout ||| Mirror twoPaneLayout ||| Grid
 
 myChat = withTwoIM pidgin skype gridFirst
     where
         pidgin = Title "Buddy List"
-        skype = And (ClassName "Skype") (Not $ Role "ConversationsWindow")
+        skype = (ClassName "Skype") `And` (Not $ Role "ConversationsWindow")
         
-myLayouts = smartBorders $ toggleLayouts Full perWS
+myLayouts = desktopLayoutModifiers $ smartBorders $ toggleLayouts Full perWS
     where
         perWS = onWorkspace "web" tabbedFirst $
                 onWorkspace "chat" myChat $
