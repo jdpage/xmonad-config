@@ -1,24 +1,23 @@
 import XMonad
+import XMonad.Util.EZConfig
+
+import XMonad.Actions.Promote
 
 import XMonad.Config.Desktop
 import XMonad.Config.Xfce
 
-import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.Place
 
-import XMonad.Layout.Fullscreen
 import XMonad.Layout.Grid
 import XMonad.Layout.IM
 import XMonad.Layout.NoBorders
 import XMonad.Layout.PerWorkspace
 import XMonad.Layout.Reflect
+import XMonad.Layout.ShowWName
 import XMonad.Layout.Tabbed
 import XMonad.Layout.ToggleLayouts
 
-import XMonad.Util.EZConfig
-
-import qualified XMonad.StackSet as W
 import Data.Ratio ((%))
 
 main = xmonad $ xfceConfig
@@ -26,62 +25,66 @@ main = xmonad $ xfceConfig
     , manageHook = myManageHook
     , layoutHook = myLayouts
     , workspaces = ["web", "e1", "e2", "e3", "mail", "chat", "mus"]
+    , normalBorderColor = "#1d1d1d"
+    , focusedBorderColor = "#4894E3"
     } `additionalKeysP`
-    [ ("M-S-h", sendMessage $ IncMasterN   1 )
-    , ("M-S-l", sendMessage $ IncMasterN (-1))
+    [ ("M-<Return>", promote)
     ]
 
-myManageHook = manageHook defaultConfig <+>
-               manageDocks <+>
-               fullscreenManageHook <+>
-               floatingHook <+>
-               placeWindowsHook <+>
-               (isFullscreen --> doFullFloat)
+{-
+ - Helper functions
+ -}
 
-floatingHook = composeAll . concat $
-    [ [ className       =? c --> (centerFloat <+> doFloat) | c <- myCFloats ]
-    , [ title           =? t --> (centerFloat <+> doFloat) | t <- myTFloats ]
-    , [ className       =? c --> (cornerFloat <+> doFloat) | c <- myNFloats ]
+-- perform an action on windows with a class in a list
+doForClasses ac clsx = composeAll $ [ className =? c --> ac | c <- clsx]
+
+-- associate a list of windows with a workspace so that they are automatically
+-- placed there when opened.
+associateWith ws clsx = doForClasses (doShift ws) clsx
+
+-- center a floating window
+doCenter = placeHook $ withGaps (40, 10, 10, 10) $ smart (0.5, 0.5)
+
+-- check if a window is a notification
+isNotification = isInProperty "_NET_WM_WINDOW_TYPE" "_NET_WM_WINDOW_TYPE_NOTIFICATION"
+
+{-
+ - Management hooks
+ -}
+
+myManageHook = composeAll $
+    [ manageHook xfceConfig
+    , (isNotification --> doIgnore)
+    , associateWith "web"  ["Firefox"]
+    , associateWith "chat" ["Pidgin", "Skype", "Konversation"]
+    , assocaiteWith "mail" ["Thunderbird"]
+    , associateWith "mus"  ["Pragha"]
+    , doForClasses (doCenter <+> doFloat) ["Xfrun", "Xfce4-appfinder"]
+    , transience'
+    , (isFullscreen --> doFullFloat)
     ]
+
+{-
+ - Layouts
+ -}
+
+twoPaneLayouts = twoPane ||| Mirror twoPane
     where
-        myCFloats = ["Xfrun4", "Xfce4-appfinder"]
-        myTFloats = []
-        myNFloats = ["Xfce4-notifyd"]
-        avoidEdges = withGaps (40, 10, 10, 10)
-        centerFloat = placeHook $ avoidEdges $ smart (0.5, 0.5)
-        cornerFloat = placeHook $ avoidEdges $ smart (1.0, 0.0)
+        twoPane = Tall 1 3/100 1/2
 
-placeWindowsHook = composeAll . concat $
-    [ [ className       =? c --> doF (W.shift "web")       | c <- webApps  ]
-    , [ className       =? c --> doF (W.shift "chat")      | c <- chatApps ]
-    , [ className       =? c --> doF (W.shift "mail")      | c <- mailApps ]
-    , [ className       =? c --> doF (W.shift "mus")       | c <- musApps  ]
-    ]
-    where
-        webApps  = ["Firefox"]
-        chatApps = ["Pidgin", "Skype", "Konversation", "Choqok"]
-        mailApps = ["Thunderbird"]
-        musApps  = ["Pragha"]
+twoPaneFirst = twoPaneLayouts ||| Grid ||| simpleTabbed
+gridFirst    = Grid ||| simpleTabbed ||| twoPaneLayouts
+tabbedFirst  = simpleTabbed ||| twoPaneLayouts ||| Grid
 
-twoPaneLayout = Tall nmaster delta ratio
-    where
-        nmaster = 1
-        delta = 3/100
-        ratio = 1/2
+withTwoIM left right base =
+    withIM (1%6) left $ reflectHoriz $
+    withIM (1%5) right $ reflectHoriz $
+    base
 
-withTwoIM left right base = withIM (1%6) left $ reflectHoriz $ withIM (1%5) right $ reflectHoriz $ base
-
-twoPaneFirst = twoPaneLayout ||| Mirror twoPaneLayout ||| Grid ||| simpleTabbed
-gridFirst    = Grid ||| simpleTabbed ||| twoPaneLayout ||| Mirror twoPaneLayout
-tabbedFirst  = simpleTabbed ||| twoPaneLayout ||| Mirror twoPaneLayout ||| Grid
-
-myChat = withTwoIM skype pidgin gridFirst
-    where
-        pidgin = Title "Buddy List"
-        skype = (ClassName "Skype") `And` (Not $ Role "ConversationsWindow")
-        
-myLayouts = desktopLayoutModifiers $ smartBorders $ toggleLayouts Full perWS
+myLayouts = desktopLayoutModifiers $ showWName $ smartBorders $ toggleLayouts Full perWS
     where
         perWS = onWorkspace "web" tabbedFirst $
-                onWorkspace "chat" myChat $
+                onWorkspace "chat" withTwoIM skype pidgin gridFirst $
                 twoPaneFirst
+        pidgin = Title "Buddy List"
+        skype = (ClassName "Skype") `And` (Not $ Role "ConversationsWindow")
