@@ -69,13 +69,13 @@ twoPaneLayout = Tall nmaster delta ratio
         delta = 3/100
         ratio = 1/2
 
-withTwoIM left right base = withIM (1%6) right $ reflectHoriz $ withIM (1%5) left $ reflectHoriz $ base
+withTwoIM left right base = withIM (1%6) left $ reflectHoriz $ withIM (1%5) right $ reflectHoriz $ base
 
 twoPaneFirst = twoPaneLayout ||| Mirror twoPaneLayout ||| Grid ||| simpleTabbed
 gridFirst    = Grid ||| simpleTabbed ||| twoPaneLayout ||| Mirror twoPaneLayout
 tabbedFirst  = simpleTabbed ||| twoPaneLayout ||| Mirror twoPaneLayout ||| Grid
 
-myChat = withTwoIM pidgin skype gridFirst
+myChat = withTwoIM skype pidgin gridFirst
     where
         pidgin = Title "Buddy List"
         skype = (ClassName "Skype") `And` (Not $ Role "ConversationsWindow")
