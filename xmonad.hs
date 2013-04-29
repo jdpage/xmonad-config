@@ -57,7 +57,7 @@ myManageHook = composeAll $
     , (isNotification --> doIgnore)
     , associateWith "web"  ["Firefox"]
     , associateWith "chat" ["Pidgin", "Skype", "Konversation"]
-    , assocaiteWith "mail" ["Thunderbird"]
+    , associateWith "mail" ["Thunderbird"]
     , associateWith "mus"  ["Pragha"]
     , doForClasses (doCenter <+> doFloat) ["Xfrun", "Xfce4-appfinder"]
     , transience'
@@ -70,7 +70,7 @@ myManageHook = composeAll $
 
 twoPaneLayouts = twoPane ||| Mirror twoPane
     where
-        twoPane = Tall 1 3/100 1/2
+        twoPane = Tall 1 (3/100) (1/2)
 
 twoPaneFirst = twoPaneLayouts ||| Grid ||| simpleTabbed
 gridFirst    = Grid ||| simpleTabbed ||| twoPaneLayouts
@@ -84,7 +84,7 @@ withTwoIM left right base =
 myLayouts = desktopLayoutModifiers $ showWName $ smartBorders $ toggleLayouts Full perWS
     where
         perWS = onWorkspace "web" tabbedFirst $
-                onWorkspace "chat" withTwoIM skype pidgin gridFirst $
+                onWorkspace "chat" (withTwoIM skype pidgin gridFirst) $
                 twoPaneFirst
         pidgin = Title "Buddy List"
         skype = (ClassName "Skype") `And` (Not $ Role "ConversationsWindow")
