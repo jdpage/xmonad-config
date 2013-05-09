@@ -59,7 +59,7 @@ myConfig = (\c -> c
         dbusLogWithPP myPrettyPrinter
         ewmhDesktopsLogHookCustom namedScratchpadFilterOutWorkspace
     , manageHook = myManageHook <+> manageHook c
-    , handleEventHook = updateLogEventHook <+> handleEventHook c
+    , handleEventHook = updateLogEventHook <+> ewmhDesktopsEventHookCustom namedScratchpadFilterOutWorkspace
     , workspaces = ["web", "e1", "e2", "e3", "mail", "chat"]
     , normalBorderColor = "#1d1d1d"
     , focusedBorderColor = "#4894E3"
