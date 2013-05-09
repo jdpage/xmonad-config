@@ -109,9 +109,7 @@ myScratchpads =
         windowRole = stringProperty "WM_WINDOW_ROLE"
 
 myPrettyPrinter = dbusPP
-    { ppTitle   = const ""
-    , ppOrder = \ (_:l:_:e) -> l:e
-    , ppHiddenNoWindows = pangoSanitize
+    { ppOrder = \ (_:l:_:e) -> l:e
     , ppExtras  = [ M.nowPlaying, M.songTimeInfo, M.statusString ]
     }
 
