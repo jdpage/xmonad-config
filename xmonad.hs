@@ -11,7 +11,6 @@ import XMonad.Config.Desktop
 import XMonad.Config.Xfce
 
 import XMonad.Hooks.DBusLog
-import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.EwmhDesktops
 import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.Place

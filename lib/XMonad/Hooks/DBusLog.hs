@@ -8,6 +8,12 @@ module XMonad.Hooks.DBusLog
     , pangoColor
     , pangoBold
     , pangoSanitize
+    -- re-export some useful stuff
+    , PP(..)
+    , wrap
+    , pad
+    , trim
+    , shorten
     ) where
 
 import Codec.Binary.UTF8.String (decodeString)
@@ -41,7 +47,7 @@ dbusLogWithPP pp = do
     session <- XS.get
     case session of
         Connected client -> io $ dbusOutput client line
-        Disconnected     -> io $ ppOutput pp line
+        Disconnected     -> return ()
 
 dbusOutput :: Client -> String -> IO ()
 dbusOutput dbus str = do
