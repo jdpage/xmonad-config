@@ -60,7 +60,7 @@ myConfig = (\c -> c
         ewmhDesktopsLogHookCustom namedScratchpadFilterOutWorkspace
     , manageHook = myManageHook <+> manageHook c
     , handleEventHook = updateLogEventHook <+> ewmhDesktopsEventHookCustom namedScratchpadFilterOutWorkspace
-    , workspaces = ["web", "e1", "e2", "e3", "mail", "chat"]
+    , workspaces = ["web", "2", "3", "4", "mail", "chat"]
     , normalBorderColor = "#1d1d1d"
     , focusedBorderColor = "#4894E3"
     , focusFollowsMouse = True
