@@ -109,7 +109,7 @@ addMusicPrompt c = mkXPrompt AddMusicPrompt c noComplete addPath
 
 ncmpcKeys' :: XPConfig -> M.Map (KeyMask, KeySym) (X ()) -> X ()
 ncmpcKeys' config map = submap $ map <+> M.fromList
-    [ ((0,          xK_s),          withMPDX previous)
+    [ ((0,          xK_s),          withMPDX stop)
     , ((shiftMask,  xK_p),          withMPDX toggle)
     , ((shiftMask,  xK_comma),      withMPDX previous)
     , ((shiftMask,  xK_period),     withMPDX next)
